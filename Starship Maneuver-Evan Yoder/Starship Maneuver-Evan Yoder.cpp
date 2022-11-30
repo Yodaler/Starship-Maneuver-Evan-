@@ -5,6 +5,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFPhysics.h>
 #include <vector>
+#include <SFML/Audio.hpp>
 
 using namespace std;
 using namespace sf;
@@ -42,6 +43,8 @@ void MoveRocketship(PhysicsSprite& rocketship, int elapsedMS) {
 }
 
 int main() {
+
+    
     string background = "background/space_background.jpg";
     string background1 = "background/space_background.jpg";
 
@@ -57,6 +60,21 @@ int main() {
     RenderWindow window;
     sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
     window.create(sf::VideoMode(800, 600, desktop.bitsPerPixel), "Starship Manuever");
+
+    SoundBuffer Buffer;
+    if (!Buffer.loadFromFile("sound/spaceship_crusing.mp3")) {
+        cout << "coul not load balloonpop.ogg" << endl;
+        exit(5);
+    }
+    Sound popSound;
+    popSound.setBuffer(Buffer);
+
+    Music music;
+    if (!music.openFromFile("sound/spaceship_crusing.mp3")) {
+        cout << "Failed to load circus.ogg ";
+        exit(6);
+    }
+    music.play();
 
     Sprite sprite1;
     Texture tex1;
