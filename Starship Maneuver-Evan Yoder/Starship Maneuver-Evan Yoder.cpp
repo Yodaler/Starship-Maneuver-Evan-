@@ -62,16 +62,16 @@ int main() {
     window.create(sf::VideoMode(800, 600, desktop.bitsPerPixel), "Starship Manuever");
 
     SoundBuffer Buffer;
-    if (!Buffer.loadFromFile("sound/spaceship_crusing.mp3")) {
-        cout << "coul not load balloonpop.ogg" << endl;
+    if (!Buffer.loadFromFile("sound/rock_music.wav")) {
+        cout << "coul not load spaceship_crusing.mp3" << endl;
         exit(5);
     }
-    Sound popSound;
-    popSound.setBuffer(Buffer);
+    Sound shipSound;
+    shipSound.setBuffer(Buffer);
 
     Music music;
-    if (!music.openFromFile("sound/spaceship_crusing.mp3")) {
-        cout << "Failed to load circus.ogg ";
+    if (!music.openFromFile("sound/rock_music.wav")) {
+        cout << "Failed to load spaceship_crusing.mp3 ";
         exit(6);
     }
     music.play();
@@ -83,7 +83,7 @@ int main() {
 
     World world(Vector2f(0, 0));
     int score(0);
-    int arrows(10);
+    int bolts(10);
 
     PhysicsSprite& rocketShip = *new PhysicsSprite();
     Texture rocketTex;
@@ -95,11 +95,11 @@ int main() {
     world.AddPhysicsBody(rocketShip);
 
 
-    PhysicsSprite arrow;
-    Texture arrowTex;
-    LoadTex(arrowTex, "images/arrow.png");
-    arrow.setTexture(arrowTex);
-    bool drawingArrow(false);
+    PhysicsSprite bolt;
+    Texture boltTex;
+    LoadTex(boltTex, "images/bolt.png");
+    bolt.setTexture(boltTex);
+    bool drawingbolt(false);
 
     PhysicsRectangle top;
     top.setSize(Vector2f(800, 10));
@@ -127,10 +127,10 @@ int main() {
 
 
 
-    top.onCollision = [&drawingArrow, &world, &arrow]
+    top.onCollision = [&drawingbolt, &world, &bolt]
     (PhysicsBodyCollisionResult result) {
-        drawingArrow = false;
-        world.RemovePhysicsBody(arrow);
+        drawingbolt = false;
+        world.RemovePhysicsBody(bolt);
     };
 
     Text scoreText;
@@ -140,16 +140,16 @@ int main() {
         exit(1);
     }
     scoreText.setFont(font);
-    Text arrowCountText;
-    arrowCountText.setFont(font);
+    Text boltCountText;
+    boltCountText.setFont(font);
 
     Clock clock;
     Time lastTime(clock.getElapsedTime());
     Time currentTime(lastTime);
     long deltaAsteroid = (0);
-    long deltaStar = (0);
+   
 
-    while ((arrows > 0) || drawingArrow) {
+    while ((bolts > 0) || drawingbolt) {
         currentTime = clock.getElapsedTime();
         Time deltaTime = currentTime - lastTime;
         long deltaMS = deltaTime.asMilliseconds();
@@ -173,11 +173,11 @@ int main() {
             world.AddPhysicsBody(asteroid);
             world.AddPhysicsBody(asteroid2);
             world.AddPhysicsBody(asteroid3);
-            asteroid.onCollision = [&drawingArrow, &world, &rocketShip, &asteroid, &asteroids, &score, &right]
+            asteroid.onCollision = [&drawingbolt, &world, &rocketShip, &asteroid, &asteroids, &score, &right]
             (PhysicsBodyCollisionResult result) {
                 if (result.object2 == rocketShip) {
-                    drawingArrow = false;
-                    //world.RemovePhysicsBody(arrow);
+                    drawingbolt = false;
+                    //world.RemovePhysicsBody(bolt);
                     world.RemovePhysicsBody(asteroid);
                     asteroids.QueueRemove(asteroid);
                     score += 10;
@@ -187,11 +187,11 @@ int main() {
                     asteroids.QueueRemove(asteroid);
                 }
             };
-            asteroid2.onCollision = [&drawingArrow, &world, &rocketShip, &asteroid2, &asteroids, &score, &right]
+            asteroid2.onCollision = [&drawingbolt, &world, &rocketShip, &asteroid2, &asteroids, &score, &right]
             (PhysicsBodyCollisionResult result) {
                 if (result.object2 == rocketShip) {
-                    drawingArrow = false;
-                    //world.RemovePhysicsBody(arrow);
+                    drawingbolt = false;
+                    //world.RemovePhysicsBody(bolt);
                     world.RemovePhysicsBody(asteroid2);
                     asteroids.QueueRemove(asteroid2);
                     score += 10;
@@ -201,11 +201,11 @@ int main() {
                     asteroids.QueueRemove(asteroid2);
                 }
             };
-            asteroid3.onCollision = [&drawingArrow, &world, &rocketShip, &asteroid3, &asteroids, &score, &right]
+            asteroid3.onCollision = [&drawingbolt, &world, &rocketShip, &asteroid3, &asteroids, &score, &right]
             (PhysicsBodyCollisionResult result) {
                 if (result.object2 == rocketShip) {
-                    drawingArrow = false;
-                    //world.RemovePhysicsBody(arrow);
+                    drawingbolt = false;
+                    //world.RemovePhysicsBody(bolt);
                     world.RemovePhysicsBody(asteroid3);
                     asteroids.QueueRemove(asteroid3);
                     score += 10;
@@ -226,18 +226,34 @@ int main() {
             world.UpdatePhysics(deltaMS);
             MoveRocketship(rocketShip, deltaMS);
             if (Keyboard::isKeyPressed(Keyboard::Space) &&
-                !drawingArrow) {
-                drawingArrow = true;
-                arrow.setCenter(rocketShip.getCenter());
-                arrow.setVelocity(Vector2f(0, 0));
-                world.AddPhysicsBody(arrow);
-                arrows -= 1;
+                !drawingbolt) {
+                drawingbolt = true;
+                bolt.setCenter(rocketShip.getCenter());
+                bolt.setVelocity(Vector2f(0, 0));
+                world.AddPhysicsBody(bolt);
+                bolts -= 1;
+
+                SoundBuffer Buffer;
+                if (!Buffer.loadFromFile("sound/blaster.wav")) {
+                    cout << "coul not load spaceship_crusing.mp3" << endl;
+                    exit(5);
+                }
+                Sound shipSound;
+                shipSound.setBuffer(Buffer);
+
+                Music music;
+                if (!music.openFromFile("sound/blaster.wav")) {
+                    cout << "Failed to load spaceship_crusing.mp3 ";
+                    exit(6);
+                }
+                music.play();
             }
+            
 
             window.clear();
             window.draw(sprite1);
-            if (drawingArrow) {
-                window.draw(arrow);
+            if (drawingbolt) {
+                window.draw(bolt);
             }
             for (PhysicsShape& asteroid : asteroids) {
                 window.draw((PhysicsSprite&)asteroid);
@@ -248,11 +264,11 @@ int main() {
             scoreText.setPosition(
                 Vector2f(790 - textBounds.width, 590 - textBounds.height));
             window.draw(scoreText);
-            arrowCountText.setString(to_string(arrows));
-            textBounds = arrowCountText.getGlobalBounds();
-            arrowCountText.setPosition(
+            boltCountText.setString(to_string(bolts));
+            textBounds = boltCountText.getGlobalBounds();
+            boltCountText.setPosition(
                 Vector2f(10, 590 - textBounds.height));
-            window.draw(arrowCountText);
+            window.draw(boltCountText);
             //world.VisualizeAllBounds(window);
 
             window.display();
