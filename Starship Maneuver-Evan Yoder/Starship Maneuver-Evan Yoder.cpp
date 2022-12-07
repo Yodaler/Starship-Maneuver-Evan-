@@ -44,6 +44,47 @@ void MoveRocketship(PhysicsSprite& rocketship, int elapsedMS) {
 
 int main() {
 
+    Text scoreText;
+    Font font; 
+
+    string background0 = "titlepage/starship_maneuver_logo.png";
+    Text controls;
+    controls.setFont(font);
+    controls.setString("Move up, down, left, and right. Shoot with spacebar.");
+    FloatRect textBounds0 = controls.getGlobalBounds();
+    controls.setPosition(Vector2f(
+        400 - (textBounds0.width / 2),
+        300 - (textBounds0.height / 2)
+    ));
+
+
+
+    Texture backgroundTex0;
+    if (!backgroundTex0.loadFromFile(background0)) {
+        cout << "Couldn't Load Image" << endl;
+        exit(1);
+    }
+    Image backgroundImage0;
+    backgroundImage0 = backgroundTex0.copyToImage();
+
+
+    /*Text gameOverText;
+    gameOverText.setFont(font);
+    gameOverText.setString("GAME OVER");
+    FloatRect textBounds = gameOverText.getGlobalBounds();
+    gameOverText.setPosition(Vector2f(
+        400 - (textBounds.width / 2),
+        300 - (textBounds.height / 2)
+    ));
+    window.draw(gameOverText);
+    window.display();
+    bool LeaveVar(true);
+    do {
+        if (Keyboard::isKeyPressed(Keyboard::Space)) {
+            LeaveVar = false;
+        }
+    } while (LeaveVar);*/
+
     
     string background = "background/space_background.jpg";
     string background1 = "background/space_background.jpg";
@@ -133,8 +174,6 @@ int main() {
         world.RemovePhysicsBody(bolt);
     };
 
-    Text scoreText;
-    Font font;
     if (!font.loadFromFile("fonts/Star_Shield.ttf")) {
         cout << "Couldn't load font Star Shield.ttf" << endl;
         exit(1);
