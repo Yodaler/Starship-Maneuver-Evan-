@@ -7,6 +7,7 @@
 #include <vector>
 #include <SFML/Audio.hpp>
 
+
 using namespace std;
 using namespace sf;
 using namespace sfp;
@@ -32,7 +33,7 @@ void MoveRocketship(PhysicsSprite& rocketship, int elapsedMS) {
     }
     if (Keyboard::isKeyPressed(Keyboard::Up)) {
         Vector2f newPos(rocketship.getCenter());
-        newPos.y = newPos.y - (KB_SPEED * elapsedMS * 2);
+        newPos.y = newPos.y - (KB_SPEED * elapsedMS );
         rocketship.setCenter(newPos);
     }
     if (Keyboard::isKeyPressed(Keyboard::Down)) {
@@ -67,25 +68,6 @@ int main() {
     Image backgroundImage0;
     backgroundImage0 = backgroundTex0.copyToImage();
 
-
-    /*Text gameOverText;
-    gameOverText.setFont(font);
-    gameOverText.setString("GAME OVER");
-    FloatRect textBounds = gameOverText.getGlobalBounds();
-    gameOverText.setPosition(Vector2f(
-        400 - (textBounds.width / 2),
-        300 - (textBounds.height / 2)
-    ));
-    window.draw(gameOverText);
-    window.display();
-    bool LeaveVar(true);
-    do {
-        if (Keyboard::isKeyPressed(Keyboard::Space)) {
-            LeaveVar = false;
-        }
-    } while (LeaveVar);*/
-
-    
     string background = "background/space_background.jpg";
     string background1 = "background/space_background.jpg";
 
@@ -199,38 +181,50 @@ int main() {
             PhysicsSprite& asteroid = asteroids.Create();
             PhysicsSprite& asteroid2 = asteroids.Create();
             PhysicsSprite& asteroid3 = asteroids.Create();
+            PhysicsSprite& asteroid4 = asteroids.Create();
+            PhysicsSprite& asteroid5 = asteroids.Create();
             asteroid.setTexture(redTex);
             asteroid2.setTexture(redTex);
             asteroid3.setTexture(redTex);
+            asteroid4.setTexture(redTex);
+            asteroid5.setTexture(redTex);
             Vector2f sz = asteroid.getSize();
             asteroid.setCenter(Vector2f(200, 100 + (sz.x / 2)));
             asteroid2.setCenter(Vector2f(400, 200 + (sz.x / 2)));
             asteroid3.setCenter(Vector2f(600, 100 + (sz.x / 2)));
+            asteroid4.setCenter(Vector2f(700, 200 + (sz.x / 2)));
+            asteroid5.setCenter(Vector2f(100, 200 + (sz.x / 2)));
             asteroid.setVelocity(Vector2f(0, 0.20));
             asteroid2.setVelocity(Vector2f(0, 0.20));
             asteroid3.setVelocity(Vector2f(0, 0.20));
+            asteroid4.setVelocity(Vector2f(0, 0.20));
+            asteroid5.setVelocity(Vector2f(0, 0.20));
+
             world.AddPhysicsBody(asteroid);
             world.AddPhysicsBody(asteroid2);
             world.AddPhysicsBody(asteroid3);
-            asteroid.onCollision = [&drawingbolt, &world, &rocketShip, &asteroid, &asteroids, &score, &right]
+            world.AddPhysicsBody(asteroid4);
+            world.AddPhysicsBody(asteroid5);
+            asteroid.onCollision = [&drawingbolt, &world, &rocketShip, &bolt, &bolts, &asteroid, &asteroids, &score, &right]
             (PhysicsBodyCollisionResult result) {
-                if (result.object2 == rocketShip) {
+                if (result.object2 == bolt) {
                     drawingbolt = false;
-                    //world.RemovePhysicsBody(bolt);
+                    world.RemovePhysicsBody(bolt);
                     world.RemovePhysicsBody(asteroid);
                     asteroids.QueueRemove(asteroid);
                     score += 10;
                 }
                 if (result.object2 == right) {
                     world.RemovePhysicsBody(asteroid);
+
                     asteroids.QueueRemove(asteroid);
                 }
             };
-            asteroid2.onCollision = [&drawingbolt, &world, &rocketShip, &asteroid2, &asteroids, &score, &right]
+            asteroid2.onCollision = [&drawingbolt, &world, &rocketShip, &bolt, &asteroid2, &asteroids, &score, &right]
             (PhysicsBodyCollisionResult result) {
-                if (result.object2 == rocketShip) {
+                if (result.object2 == bolt) {
                     drawingbolt = false;
-                    //world.RemovePhysicsBody(bolt);
+                    world.RemovePhysicsBody(bolt);
                     world.RemovePhysicsBody(asteroid2);
                     asteroids.QueueRemove(asteroid2);
                     score += 10;
@@ -240,11 +234,11 @@ int main() {
                     asteroids.QueueRemove(asteroid2);
                 }
             };
-            asteroid3.onCollision = [&drawingbolt, &world, &rocketShip, &asteroid3, &asteroids, &score, &right]
+            asteroid3.onCollision = [&drawingbolt, &world, &rocketShip, &bolt, &asteroid3, &asteroids, &score, &right]
             (PhysicsBodyCollisionResult result) {
-                if (result.object2 == rocketShip) {
+                if (result.object2 == bolt) {
                     drawingbolt = false;
-                    //world.RemovePhysicsBody(bolt);
+                    world.RemovePhysicsBody(bolt);
                     world.RemovePhysicsBody(asteroid3);
                     asteroids.QueueRemove(asteroid3);
                     score += 10;
@@ -252,6 +246,35 @@ int main() {
                 if (result.object2 == right) {
                     world.RemovePhysicsBody(asteroid3);
                     asteroids.QueueRemove(asteroid3);
+                }
+            };
+            asteroid4.onCollision = [&drawingbolt, &world, &rocketShip, &bolt, &asteroid4, &asteroids, &score, &right]
+            (PhysicsBodyCollisionResult result) {
+                if (result.object2 == bolt) {
+                    drawingbolt = false;
+                    world.RemovePhysicsBody(bolt);
+                    world.RemovePhysicsBody(asteroid4);
+                    asteroids.QueueRemove(asteroid4);
+                    score += 10;
+                }
+                if (result.object2 == right) {
+                    world.RemovePhysicsBody(asteroid4);
+                    asteroids.QueueRemove(asteroid4);
+                }
+
+            };
+            asteroid5.onCollision = [&drawingbolt, &world, &rocketShip, &bolt, &asteroid5, &asteroids, &score, &right]
+            (PhysicsBodyCollisionResult result) {
+                if (result.object2 == bolt) {
+                    drawingbolt = false;
+                    world.RemovePhysicsBody(bolt);
+                    world.RemovePhysicsBody(asteroid5);
+                    asteroids.QueueRemove(asteroid5);
+                    score += 10;
+                }
+                if (result.object2 == right) {
+                    world.RemovePhysicsBody(asteroid5);
+                    asteroids.QueueRemove(asteroid5);
                 }
             };
         }
@@ -268,7 +291,7 @@ int main() {
                 !drawingbolt) {
                 drawingbolt = true;
                 bolt.setCenter(rocketShip.getCenter());
-                bolt.setVelocity(Vector2f(0, 0));
+                bolt.setVelocity(Vector2f(0, -1));
                 world.AddPhysicsBody(bolt);
                 bolts -= 1;
 
