@@ -8,6 +8,7 @@
 #include <SFML/Audio.hpp>
 
 
+
 using namespace std;
 using namespace sf;
 using namespace sfp;
@@ -33,7 +34,7 @@ void MoveRocketship(PhysicsSprite& rocketship, int elapsedMS) {
     }
     if (Keyboard::isKeyPressed(Keyboard::Up)) {
         Vector2f newPos(rocketship.getCenter());
-        newPos.y = newPos.y - (KB_SPEED * elapsedMS );
+        newPos.y = newPos.y - (KB_SPEED * elapsedMS * 2);
         rocketship.setCenter(newPos);
     }
     if (Keyboard::isKeyPressed(Keyboard::Down)) {
@@ -43,30 +44,16 @@ void MoveRocketship(PhysicsSprite& rocketship, int elapsedMS) {
     }
 }
 
+
+
 int main() {
 
+    RenderWindow window;
+    sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
+    window.create(sf::VideoMode(800, 600, desktop.bitsPerPixel), "Starship Manuever");
+
     Text scoreText;
-    Font font; 
-
-    string background0 = "titlepage/starship_maneuver_logo.png";
-    Text controls;
-    controls.setFont(font);
-    controls.setString("Move up, down, left, and right. Shoot with spacebar.");
-    FloatRect textBounds0 = controls.getGlobalBounds();
-    controls.setPosition(Vector2f(
-        400 - (textBounds0.width / 2),
-        300 - (textBounds0.height / 2)
-    ));
-
-
-
-    Texture backgroundTex0;
-    if (!backgroundTex0.loadFromFile(background0)) {
-        cout << "Couldn't Load Image" << endl;
-        exit(1);
-    }
-    Image backgroundImage0;
-    backgroundImage0 = backgroundTex0.copyToImage();
+    Font font;
 
     string background = "background/space_background.jpg";
     string background1 = "background/space_background.jpg";
@@ -79,10 +66,6 @@ int main() {
     }
     Image backgroundImage;
     backgroundImage = backgroundTex.copyToImage();
-
-    RenderWindow window;
-    sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
-    window.create(sf::VideoMode(800, 600, desktop.bitsPerPixel), "Starship Manuever");
 
     SoundBuffer Buffer;
     if (!Buffer.loadFromFile("sound/rock_music.wav")) {
@@ -106,7 +89,8 @@ int main() {
 
     World world(Vector2f(0, 0));
     int score(0);
-    int bolts(10);
+    int bolts(15);
+  
 
     PhysicsSprite& rocketShip = *new PhysicsSprite();
     Texture rocketTex;
@@ -146,7 +130,7 @@ int main() {
     LoadTex(redTex, "images/asteroid.png");
     PhysicsShapeList<PhysicsSprite> asteroids;
 
-    
+
 
 
 
@@ -168,14 +152,14 @@ int main() {
     Time lastTime(clock.getElapsedTime());
     Time currentTime(lastTime);
     long deltaAsteroid = (0);
-   
+
 
     while ((bolts > 0) || drawingbolt) {
         currentTime = clock.getElapsedTime();
         Time deltaTime = currentTime - lastTime;
         long deltaMS = deltaTime.asMilliseconds();
-       
-        if (deltaAsteroid > 2000) {
+
+        if (deltaAsteroid > 1500) {
             deltaAsteroid = 0;
             world.UpdatePhysics(deltaAsteroid);
             PhysicsSprite& asteroid = asteroids.Create();
@@ -189,11 +173,11 @@ int main() {
             asteroid4.setTexture(redTex);
             asteroid5.setTexture(redTex);
             Vector2f sz = asteroid.getSize();
-            asteroid.setCenter(Vector2f(200, 100 + (sz.x / 2)));
-            asteroid2.setCenter(Vector2f(400, 200 + (sz.x / 2)));
-            asteroid3.setCenter(Vector2f(600, 100 + (sz.x / 2)));
-            asteroid4.setCenter(Vector2f(700, 200 + (sz.x / 2)));
-            asteroid5.setCenter(Vector2f(100, 200 + (sz.x / 2)));
+            asteroid.setCenter(Vector2f(250, 50 + (sz.x / 2)));
+            asteroid2.setCenter(Vector2f(400, 100 + (sz.x / 2)));
+            asteroid3.setCenter(Vector2f(550, 50 + (sz.x / 2)));
+            asteroid4.setCenter(Vector2f(700, 100 + (sz.x / 2)));
+            asteroid5.setCenter(Vector2f(100, 100 + (sz.x / 2)));
             asteroid.setVelocity(Vector2f(0, 0.20));
             asteroid2.setVelocity(Vector2f(0, 0.20));
             asteroid3.setVelocity(Vector2f(0, 0.20));
@@ -216,7 +200,19 @@ int main() {
                 }
                 if (result.object2 == right) {
                     world.RemovePhysicsBody(asteroid);
-
+                    asteroids.QueueRemove(asteroid);
+                }
+            };
+            asteroid.onCollision = [&drawingbolt, &world, &rocketShip, &bolt, &bolts, &asteroid, &asteroids, &score, &right]
+            (PhysicsBodyCollisionResult result) {
+                if (result.object2 == bolt) {
+                    drawingbolt = false;
+                    world.RemovePhysicsBody(bolt);
+                    world.RemovePhysicsBody(asteroid);
+                    asteroids.QueueRemove(asteroid);
+                }
+                if (result.object2 == right) {
+                    world.RemovePhysicsBody(asteroid);
                     asteroids.QueueRemove(asteroid);
                 }
             };
@@ -278,7 +274,7 @@ int main() {
                 }
             };
         }
-        
+
 
 
 
@@ -310,7 +306,7 @@ int main() {
                 }
                 music.play();
             }
-            
+
 
             window.clear();
             window.draw(sprite1);
