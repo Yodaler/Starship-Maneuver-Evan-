@@ -9,6 +9,9 @@
 
 
 
+
+
+
 using namespace std;
 using namespace sf;
 using namespace sfp;
@@ -21,16 +24,21 @@ void LoadTex(Texture& tex, string filename) {
     }
 }
 
+
+
+
 void MoveRocketship(PhysicsSprite& rocketship, int elapsedMS) {
     if (Keyboard::isKeyPressed(Keyboard::Right)) {
         Vector2f newPos(rocketship.getCenter());
         newPos.x = newPos.x + (KB_SPEED * elapsedMS);
         rocketship.setCenter(newPos);
+        
     }
     if (Keyboard::isKeyPressed(Keyboard::Left)) {
         Vector2f newPos(rocketship.getCenter());
         newPos.x = newPos.x - (KB_SPEED * elapsedMS);
         rocketship.setCenter(newPos);
+        
     }
     if (Keyboard::isKeyPressed(Keyboard::Up)) {
         Vector2f newPos(rocketship.getCenter());
@@ -48,11 +56,13 @@ void MoveRocketship(PhysicsSprite& rocketship, int elapsedMS) {
 
 int main() {
 
+
     RenderWindow window;
     sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
     window.create(sf::VideoMode(800, 600, desktop.bitsPerPixel), "Starship Manuever");
 
     Text scoreText;
+    Text lifeText;
     Font font;
 
     string background = "background/space_background.jpg";
@@ -67,20 +77,79 @@ int main() {
     Image backgroundImage;
     backgroundImage = backgroundTex.copyToImage();
 
-    SoundBuffer Buffer;
-    if (!Buffer.loadFromFile("sound/rock_music.wav")) {
-        cout << "coul not load spaceship_crusing.mp3" << endl;
+    SoundBuffer Crusing;
+    if (!Crusing.loadFromFile("sound/spaceship_crusing.wav")) {
+        cout << "coul not load spaceship_crusing.wav" << endl;
         exit(5);
     }
     Sound shipSound;
-    shipSound.setBuffer(Buffer);
+    shipSound.setBuffer(Crusing);
+
+    Music crusing;
+    if (!crusing.openFromFile("sound/spaceship_crusing.wav")) {
+        cout << "Failed to load spaceship_crusing.wav ";
+        exit(6);
+
+    }
+    SoundBuffer Buffer;
+    if (!Buffer.loadFromFile("sound/rock_music.wav")) {
+        cout << "coul not load rock_music.wav" << endl;
+        exit(5);
+    }
+    Sound backgroundSound;
+    backgroundSound.setBuffer(Buffer);
 
     Music music;
     if (!music.openFromFile("sound/rock_music.wav")) {
-        cout << "Failed to load spaceship_crusing.mp3 ";
+        cout << "Failed to load rock_music.wav ";
         exit(6);
     }
+
     music.play();
+
+    SoundBuffer Blast;
+    if (!Blast.loadFromFile("sound/blaster.wav")) {
+        cout << "coul not load blaster.wav" << endl;
+        exit(5);
+    }
+    Sound boltSound;
+    boltSound.setBuffer(Blast);
+
+    Music shoot;
+    if (!shoot.openFromFile("sound/blaster.wav")) {
+        cout << "Failed to load blaster.wav ";
+        exit(6);
+    }
+
+    SoundBuffer GameOver;
+    if (!GameOver.loadFromFile("sound/gameover.wav")) {
+        cout << "coul not load gameover.wav" << endl;
+        exit(5);
+    }
+    Sound GameOverSound;
+    GameOverSound.setBuffer(GameOver);
+
+    Music Gameover;
+    if (!Gameover.openFromFile("sound/gameover.wav")) {
+        cout << "Failed to load gameover.wav ";
+        exit(7);
+    }
+
+    if (Keyboard::isKeyPressed(Keyboard::Up)) {
+        crusing.play();
+    }
+
+    if (Keyboard::isKeyPressed(Keyboard::Right)) {
+        crusing.play();
+    }
+
+    if (Keyboard::isKeyPressed(Keyboard::Left)) {
+        crusing.play();
+    }
+
+    if (Keyboard::isKeyPressed(Keyboard::Down)) {
+        crusing.play();
+    }
 
     Sprite sprite1;
     Texture tex1;
@@ -89,8 +158,25 @@ int main() {
 
     World world(Vector2f(0, 0));
     int score(0);
-    int bolts(15);
-  
+    int bolts(5);
+    int lives(4);
+   
+    PhysicsSprite& fullBar = *new PhysicsSprite();
+    Texture fullBarTex;
+    LoadTex(fullBarTex, "images/fullgreenbar.png");
+    fullBar.setTexture(fullBarTex);
+    Vector2f sx = fullBar.getSize();
+    fullBar.setCenter(Vector2f(50,50));
+    world.AddPhysicsBody(fullBar);
+
+    PhysicsSprite& onehitBar = *new PhysicsSprite();
+    Texture oneBarTex;
+    LoadTex(fullBarTex, "images/fullgreenbar.png");
+    onehitBar.setTexture(oneBarTex);
+    Vector2f sy = onehitBar.getSize();
+    onehitBar.setCenter(Vector2f(50, 50));
+    world.AddPhysicsBody(onehitBar);
+    
 
     PhysicsSprite& rocketShip = *new PhysicsSprite();
     Texture rocketTex;
@@ -100,6 +186,7 @@ int main() {
     rocketShip.setCenter(Vector2f(400,
         600 - (sz.y / 2)));
     world.AddPhysicsBody(rocketShip);
+    
 
 
     PhysicsSprite bolt;
@@ -147,6 +234,8 @@ int main() {
     scoreText.setFont(font);
     Text boltCountText;
     boltCountText.setFont(font);
+    Text lifeCountText;
+    lifeCountText.setFont(font);
 
     Clock clock;
     Time lastTime(clock.getElapsedTime());
@@ -154,7 +243,7 @@ int main() {
     long deltaAsteroid = (0);
 
 
-    while ((bolts > 0) || drawingbolt) {
+    while ((bolts > 0, lives > 0) || drawingbolt) {
         currentTime = clock.getElapsedTime();
         Time deltaTime = currentTime - lastTime;
         long deltaMS = deltaTime.asMilliseconds();
@@ -189,7 +278,7 @@ int main() {
             world.AddPhysicsBody(asteroid3);
             world.AddPhysicsBody(asteroid4);
             world.AddPhysicsBody(asteroid5);
-            asteroid.onCollision = [&drawingbolt, &world, &rocketShip, &bolt, &bolts, &asteroid, &asteroids, &score, &right]
+            asteroid.onCollision = [&drawingbolt, &world, &rocketShip, &bolt, &bolts, &lives, &asteroid, &asteroids, &score, &right]
             (PhysicsBodyCollisionResult result) {
                 if (result.object2 == bolt) {
                     drawingbolt = false;
@@ -197,26 +286,34 @@ int main() {
                     world.RemovePhysicsBody(asteroid);
                     asteroids.QueueRemove(asteroid);
                     score += 10;
+                    lives -= 1;
+                    
                 }
                 if (result.object2 == right) {
-                    world.RemovePhysicsBody(asteroid);
-                    asteroids.QueueRemove(asteroid);
-                }
-            };
-            asteroid.onCollision = [&drawingbolt, &world, &rocketShip, &bolt, &bolts, &asteroid, &asteroids, &score, &right]
-            (PhysicsBodyCollisionResult result) {
-                if (result.object2 == bolt) {
-                    drawingbolt = false;
                     world.RemovePhysicsBody(bolt);
                     world.RemovePhysicsBody(asteroid);
                     asteroids.QueueRemove(asteroid);
                 }
+            };
+
+            asteroid.onCollision = [&drawingbolt, &world, &rocketShip, &lives, &asteroid, &asteroids, &score, &right]
+            (PhysicsBodyCollisionResult result) {
+                if (result.object2 == rocketShip) {
+                   
+                    
+                    world.RemovePhysicsBody(asteroid);
+                    asteroids.QueueRemove(asteroid);
+                    lives -= 1;
+
+                }
                 if (result.object2 == right) {
+                    
                     world.RemovePhysicsBody(asteroid);
                     asteroids.QueueRemove(asteroid);
                 }
             };
-            asteroid2.onCollision = [&drawingbolt, &world, &rocketShip, &bolt, &asteroid2, &asteroids, &score, &right]
+            
+            asteroid2.onCollision = [&drawingbolt, &world, &rocketShip, &bolt, &lives, &asteroid2, &asteroids, &score, &right]
             (PhysicsBodyCollisionResult result) {
                 if (result.object2 == bolt) {
                     drawingbolt = false;
@@ -230,7 +327,23 @@ int main() {
                     asteroids.QueueRemove(asteroid2);
                 }
             };
-            asteroid3.onCollision = [&drawingbolt, &world, &rocketShip, &bolt, &asteroid3, &asteroids, &score, &right]
+            asteroid2.onCollision = [&drawingbolt, &world, &rocketShip, &lives, &asteroid2, &asteroids, &score, &right]
+            (PhysicsBodyCollisionResult result) {
+                if (result.object2 == rocketShip) {
+                    drawingbolt = false;
+                    
+                    world.RemovePhysicsBody(asteroid2);
+                    asteroids.QueueRemove(asteroid2);
+                    score += 10;
+                    lives -= 1;
+                }
+                if (result.object2 == right) {
+                    world.RemovePhysicsBody(asteroid2);
+                    asteroids.QueueRemove(asteroid2);
+                }
+            };
+
+            asteroid3.onCollision = [&drawingbolt, &world, &rocketShip, &bolt, &lives, &asteroid3, &asteroids, &score, &right]
             (PhysicsBodyCollisionResult result) {
                 if (result.object2 == bolt) {
                     drawingbolt = false;
@@ -244,7 +357,22 @@ int main() {
                     asteroids.QueueRemove(asteroid3);
                 }
             };
-            asteroid4.onCollision = [&drawingbolt, &world, &rocketShip, &bolt, &asteroid4, &asteroids, &score, &right]
+            asteroid3.onCollision = [&drawingbolt, &world, &rocketShip, &lives, &asteroid3, &asteroids, &score, &right]
+            (PhysicsBodyCollisionResult result) {
+                if (result.object2 == rocketShip) {
+                    drawingbolt = false;
+                    
+                    world.RemovePhysicsBody(asteroid3);
+                    asteroids.QueueRemove(asteroid3);
+                    lives -= 1;
+                }
+                if (result.object2 == right) {
+                    world.RemovePhysicsBody(asteroid3);
+                    asteroids.QueueRemove(asteroid3);
+                }
+            };
+
+            asteroid4.onCollision = [&drawingbolt, &world, &rocketShip, &bolt, &lives, &asteroid4, &asteroids, &score, &right]
             (PhysicsBodyCollisionResult result) {
                 if (result.object2 == bolt) {
                     drawingbolt = false;
@@ -259,7 +387,22 @@ int main() {
                 }
 
             };
-            asteroid5.onCollision = [&drawingbolt, &world, &rocketShip, &bolt, &asteroid5, &asteroids, &score, &right]
+            asteroid4.onCollision = [&drawingbolt, &world, &rocketShip, &lives, &asteroid4, &asteroids, &score, &right]
+            (PhysicsBodyCollisionResult result) {
+                if (result.object2 == rocketShip) {
+                    drawingbolt = false;
+                    world.RemovePhysicsBody(asteroid4);
+                    asteroids.QueueRemove(asteroid4);
+                    lives -= 1;
+                }
+                if (result.object2 == right) {
+                    world.RemovePhysicsBody(asteroid4);
+                    asteroids.QueueRemove(asteroid4);
+                }
+
+            };
+
+            asteroid5.onCollision = [&drawingbolt, &world, &rocketShip, &bolt, &lives, &asteroid5, &asteroids, &score, &right]
             (PhysicsBodyCollisionResult result) {
                 if (result.object2 == bolt) {
                     drawingbolt = false;
@@ -273,6 +416,21 @@ int main() {
                     asteroids.QueueRemove(asteroid5);
                 }
             };
+            asteroid5.onCollision = [&drawingbolt, &world, &rocketShip, &lives, &asteroid5, &asteroids, &score, &right]
+            (PhysicsBodyCollisionResult result) {
+                if (result.object2 == rocketShip) {
+                    drawingbolt = false;
+                    
+                    world.RemovePhysicsBody(asteroid5);
+                    asteroids.QueueRemove(asteroid5);
+                    lives -= 1;
+                }
+                if (result.object2 == right) {
+                    world.RemovePhysicsBody(asteroid5);
+                    asteroids.QueueRemove(asteroid5);
+                }
+            };
+        
         }
 
 
@@ -291,23 +449,10 @@ int main() {
                 world.AddPhysicsBody(bolt);
                 bolts -= 1;
 
-                SoundBuffer Buffer;
-                if (!Buffer.loadFromFile("sound/blaster.wav")) {
-                    cout << "coul not load spaceship_crusing.mp3" << endl;
-                    exit(5);
-                }
-                Sound shipSound;
-                shipSound.setBuffer(Buffer);
-
-                Music music;
-                if (!music.openFromFile("sound/blaster.wav")) {
-                    cout << "Failed to load spaceship_crusing.mp3 ";
-                    exit(6);
-                }
-                music.play();
+                shoot.play();
             }
 
-
+           
             window.clear();
             window.draw(sprite1);
             if (drawingbolt) {
@@ -317,11 +462,22 @@ int main() {
                 window.draw((PhysicsSprite&)asteroid);
             }
             window.draw(rocketShip);
+            window.draw(fullBar);
+            window.draw(onehitBar);
+
+            
             scoreText.setString(to_string(score));
             FloatRect textBounds = scoreText.getGlobalBounds();
             scoreText.setPosition(
                 Vector2f(790 - textBounds.width, 590 - textBounds.height));
-            window.draw(scoreText);
+            window.draw(scoreText); 
+
+            lifeCountText.setString(to_string(lives));
+            textBounds = lifeCountText.getGlobalBounds();
+            lifeCountText.setPosition(
+                Vector2f(10, 50 - textBounds.height));
+            window.draw(lifeCountText);
+
             boltCountText.setString(to_string(bolts));
             textBounds = boltCountText.getGlobalBounds();
             boltCountText.setPosition(
@@ -334,6 +490,8 @@ int main() {
         }
     }
 
+    
+
     Text gameOverText;
     gameOverText.setFont(font);
     gameOverText.setString("GAME OVER");
@@ -342,14 +500,21 @@ int main() {
         400 - (textBounds.width / 2),
         300 - (textBounds.height / 2)
     ));
+
+    
+
     window.draw(gameOverText);
     window.display();
     bool LeaveVar(true);
     do {
+       
+
         if (Keyboard::isKeyPressed(Keyboard::Space)) {
             LeaveVar = false;
         }
     } while (LeaveVar);
+
+  
 
 }
 
