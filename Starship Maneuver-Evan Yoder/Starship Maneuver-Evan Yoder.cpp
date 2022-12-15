@@ -159,7 +159,7 @@ int main() {
     World world(Vector2f(0, 0));
     int score(0);
     int bolts(20);
-    int lives(2);
+    int lives(5);
    
     PhysicsSprite& fullBar = *new PhysicsSprite();
     Texture fullBarTex;
