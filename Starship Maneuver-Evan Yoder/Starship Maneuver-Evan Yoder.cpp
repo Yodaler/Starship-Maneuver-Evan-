@@ -159,7 +159,7 @@ int main() {
     World world(Vector2f(0, 0));
     int score(0);
     int bolts(20);
-    int lives(10);
+    int lives(2);
    
     PhysicsSprite& fullBar = *new PhysicsSprite();
     Texture fullBarTex;
@@ -443,16 +443,16 @@ int main() {
         300 - (textBounds.height / 2)
     ));
 
-    
+    Gameover.play();
 
     window.draw(gameOverText);
     window.display();
     bool LeaveVar(true);
     do {
        
-        music.stop();
+        music.pause();
 
-        Gameover.play(); 
+        
 
         if (Keyboard::isKeyPressed(Keyboard::Space)) {
             LeaveVar = false;
