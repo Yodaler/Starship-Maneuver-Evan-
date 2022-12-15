@@ -278,6 +278,7 @@ int main() {
             world.AddPhysicsBody(asteroid3);
             world.AddPhysicsBody(asteroid4);
             world.AddPhysicsBody(asteroid5);
+
             asteroid.onCollision = [&drawingbolt, &world, &rocketShip, &bolt, &bolts, &lives, &asteroid, &asteroids, &score, &right]
             (PhysicsBodyCollisionResult result) {
                 if (result.object2 == bolt) {
@@ -286,92 +287,57 @@ int main() {
                     world.RemovePhysicsBody(asteroid);
                     asteroids.QueueRemove(asteroid);
                     score += 10;
-                    lives -= 1;
+                   
                     
                 }
-                if (result.object2 == right) {
+                if (result.object2 == rocketShip) {
+                    drawingbolt = false;
                     world.RemovePhysicsBody(bolt);
                     world.RemovePhysicsBody(asteroid);
                     asteroids.QueueRemove(asteroid);
+                    lives -= 1;
                 }
             };
 
-            asteroid.onCollision = [&drawingbolt, &world, &rocketShip, &lives, &asteroid, &asteroids, &score, &right]
+            
+            
+            asteroid2.onCollision = [&drawingbolt, &world, &rocketShip, &bolt, &bolts, &lives, & asteroid2, & asteroids, & score, & right]
+            (PhysicsBodyCollisionResult result) {
+                if (result.object2 == bolt) {
+                    drawingbolt = false;
+                    world.RemovePhysicsBody(bolt);
+                    world.RemovePhysicsBody(asteroid2);
+                    asteroids.QueueRemove(asteroid2);
+                    score += 10;
+                }
+                if (result.object2 == rocketShip) {
+                    drawingbolt = false;
+                    world.RemovePhysicsBody(bolt);
+                    world.RemovePhysicsBody(asteroid2);
+                    asteroids.QueueRemove(asteroid2);
+                    lives -= 1;
+                }
+            };
+           
+
+            asteroid3.onCollision = [&drawingbolt, &world, &rocketShip, &bolt, &bolts,  &lives, &asteroid3, &asteroids, &score, &right]
             (PhysicsBodyCollisionResult result) {
                 if (result.object2 == rocketShip) {
-                   
-                    
-                    world.RemovePhysicsBody(asteroid);
-                    asteroids.QueueRemove(asteroid);
+                    drawingbolt = false;
+                    world.RemovePhysicsBody(bolt);
+                    world.RemovePhysicsBody(asteroid3);
+                    asteroids.QueueRemove(asteroid3);
                     lives -= 1;
-
                 }
-                if (result.object2 == right) {
-                    
-                    world.RemovePhysicsBody(asteroid);
-                    asteroids.QueueRemove(asteroid);
+                if (result.object2 == bolt) {
+                    drawingbolt = false;
+                    world.RemovePhysicsBody(bolt);
+                    world.RemovePhysicsBody(asteroid3);
+                    asteroids.QueueRemove(asteroid3);
+                    score += 10;
                 }
             };
             
-            asteroid2.onCollision = [&drawingbolt, &world, &rocketShip, &bolt, &lives, &asteroid2, &asteroids, &score, &right]
-            (PhysicsBodyCollisionResult result) {
-                if (result.object2 == bolt) {
-                    drawingbolt = false;
-                    world.RemovePhysicsBody(bolt);
-                    world.RemovePhysicsBody(asteroid2);
-                    asteroids.QueueRemove(asteroid2);
-                    score += 10;
-                }
-                if (result.object2 == right) {
-                    world.RemovePhysicsBody(asteroid2);
-                    asteroids.QueueRemove(asteroid2);
-                }
-            };
-            asteroid2.onCollision = [&drawingbolt, &world, &rocketShip, &lives, &asteroid2, &asteroids, &score, &right]
-            (PhysicsBodyCollisionResult result) {
-                if (result.object2 == rocketShip) {
-                    drawingbolt = false;
-                    
-                    world.RemovePhysicsBody(asteroid2);
-                    asteroids.QueueRemove(asteroid2);
-                    score += 10;
-                    lives -= 1;
-                }
-                if (result.object2 == right) {
-                    world.RemovePhysicsBody(asteroid2);
-                    asteroids.QueueRemove(asteroid2);
-                }
-            };
-
-            asteroid3.onCollision = [&drawingbolt, &world, &rocketShip, &bolt, &lives, &asteroid3, &asteroids, &score, &right]
-            (PhysicsBodyCollisionResult result) {
-                if (result.object2 == bolt) {
-                    drawingbolt = false;
-                    world.RemovePhysicsBody(bolt);
-                    world.RemovePhysicsBody(asteroid3);
-                    asteroids.QueueRemove(asteroid3);
-                    score += 10;
-                }
-                if (result.object2 == right) {
-                    world.RemovePhysicsBody(asteroid3);
-                    asteroids.QueueRemove(asteroid3);
-                }
-            };
-            asteroid3.onCollision = [&drawingbolt, &world, &rocketShip, &lives, &asteroid3, &asteroids, &score, &right]
-            (PhysicsBodyCollisionResult result) {
-                if (result.object2 == rocketShip) {
-                    drawingbolt = false;
-                    
-                    world.RemovePhysicsBody(asteroid3);
-                    asteroids.QueueRemove(asteroid3);
-                    lives -= 1;
-                }
-                if (result.object2 == right) {
-                    world.RemovePhysicsBody(asteroid3);
-                    asteroids.QueueRemove(asteroid3);
-                }
-            };
-
             asteroid4.onCollision = [&drawingbolt, &world, &rocketShip, &bolt, &lives, &asteroid4, &asteroids, &score, &right]
             (PhysicsBodyCollisionResult result) {
                 if (result.object2 == bolt) {
