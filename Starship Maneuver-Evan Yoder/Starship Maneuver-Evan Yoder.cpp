@@ -8,10 +8,6 @@
 #include <SFML/Audio.hpp>
 
 
-
-
-
-
 using namespace std;
 using namespace sf;
 using namespace sfp;
