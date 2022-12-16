@@ -22,7 +22,7 @@ void LoadTex(Texture& tex, string filename) {
 
 
 
-
+//Moving the Rocketship via keys
 void MoveRocketship(PhysicsSprite& rocketship, int elapsedMS) {
     if (Keyboard::isKeyPressed(Keyboard::Right)) {
         Vector2f newPos(rocketship.getCenter());
@@ -36,6 +36,9 @@ void MoveRocketship(PhysicsSprite& rocketship, int elapsedMS) {
         rocketship.setCenter(newPos);
         
     }
+
+    //Upward Y velocity is increased by 2 to help against physics on the rocketship
+
     if (Keyboard::isKeyPressed(Keyboard::Up)) {
         Vector2f newPos(rocketship.getCenter());
         newPos.y = newPos.y - (KB_SPEED * elapsedMS * 2);
@@ -51,8 +54,7 @@ void MoveRocketship(PhysicsSprite& rocketship, int elapsedMS) {
 
 
 int main() {
-
-
+    //Rendering the window
     RenderWindow window;
     sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
     window.create(sf::VideoMode(800, 600, desktop.bitsPerPixel), "Starship Manuever");
@@ -61,6 +63,7 @@ int main() {
     Text lifeText;
     Font font;
 
+    //Adding in the background
     string background = "background/space_background.jpg";
     string background1 = "background/space_background.jpg";
 
@@ -73,6 +76,7 @@ int main() {
     Image backgroundImage;
     backgroundImage = backgroundTex.copyToImage();
 
+    //Adding audio and sound effects
     SoundBuffer Crusing;
     if (!Crusing.loadFromFile("sound/spaceship_crusing.wav")) {
         cout << "coul not load spaceship_crusing.wav" << endl;
@@ -131,32 +135,20 @@ int main() {
         exit(7);
     }
 
-    if (Keyboard::isKeyPressed(Keyboard::Up)) {
-        crusing.play();
-    }
-
-    if (Keyboard::isKeyPressed(Keyboard::Right)) {
-        crusing.play();
-    }
-
-    if (Keyboard::isKeyPressed(Keyboard::Left)) {
-        crusing.play();
-    }
-
-    if (Keyboard::isKeyPressed(Keyboard::Down)) {
-        crusing.play();
-    }
+   
 
     Sprite sprite1;
     Texture tex1;
     tex1.loadFromImage(backgroundImage);
     sprite1.setTexture(tex1);
 
+    //Adding the score, bolts, and health quantities
     World world(Vector2f(0, 0));
     int score(0);
     int bolts(20);
     int lives(5);
    
+    //Declaring Sprites
     PhysicsSprite& fullBar = *new PhysicsSprite();
     Texture fullBarTex;
     LoadTex(fullBarTex, "images/fullgreenbar.png");
@@ -165,14 +157,6 @@ int main() {
     fullBar.setCenter(Vector2f(50,50));
     world.AddPhysicsBody(fullBar);
 
-    PhysicsSprite& onehitBar = *new PhysicsSprite();
-    Texture oneBarTex;
-    LoadTex(fullBarTex, "images/fullgreenbar.png");
-    onehitBar.setTexture(oneBarTex);
-    Vector2f sy = onehitBar.getSize();
-    onehitBar.setCenter(Vector2f(50, 50));
-    world.AddPhysicsBody(onehitBar);
-    
 
     PhysicsSprite& rocketShip = *new PhysicsSprite();
     Texture rocketTex;
@@ -183,8 +167,6 @@ int main() {
         600 - (sz.y / 2)));
     world.AddPhysicsBody(rocketShip);
     
-
-
     PhysicsSprite bolt;
     Texture boltTex;
     LoadTex(boltTex, "images/bolt.png");
@@ -223,6 +205,7 @@ int main() {
         world.RemovePhysicsBody(bolt);
     };
 
+    //Adding font style
     if (!font.loadFromFile("fonts/Star_Shield.ttf")) {
         cout << "Couldn't load font Star Shield.ttf" << endl;
         exit(1);
@@ -233,18 +216,19 @@ int main() {
     Text lifeCountText;
     lifeCountText.setFont(font);
 
+    //Adding Clock
     Clock clock;
     Time lastTime(clock.getElapsedTime());
     Time currentTime(lastTime);
     long deltaAsteroid = (0);
 
-
+    //While the lives and bolts are greater than 0, the asteroids are added in
     while ((bolts > 0, lives > 0) || drawingbolt) {
         currentTime = clock.getElapsedTime();
         Time deltaTime = currentTime - lastTime;
         long deltaMS = deltaTime.asMilliseconds();
 
-        if (deltaAsteroid > 1500) {
+        if (deltaAsteroid > 2000) {
             deltaAsteroid = 0;
             world.UpdatePhysics(deltaAsteroid);
             PhysicsSprite& asteroid = asteroids.Create();
@@ -275,6 +259,7 @@ int main() {
             world.AddPhysicsBody(asteroid4);
             world.AddPhysicsBody(asteroid5);
 
+            //Adding the collision to asteroids, bolts, and rocketship to add score and take away health
             asteroid.onCollision = [&drawingbolt, &world, &rocketShip, &bolt, &bolts, &lives, &asteroid, &asteroids, &score, &right]
             (PhysicsBodyCollisionResult result) {
                 if (result.object2 == bolt) {
@@ -373,8 +358,8 @@ int main() {
 
 
 
-
-        if (deltaMS > 9) {
+        //This command has the bolts appear from the center of the rocketship
+        if (deltaMS > 10) {
             deltaAsteroid += deltaMS;
             lastTime = currentTime;
             world.UpdatePhysics(deltaMS);
@@ -401,9 +386,9 @@ int main() {
             }
             window.draw(rocketShip);
             window.draw(fullBar);
-            window.draw(onehitBar);
+          
 
-            
+            //"Drawing" the corrdinates and font to the score, bolts, and health text
             scoreText.setString(to_string(score));
             FloatRect textBounds = scoreText.getGlobalBounds();
             scoreText.setPosition(
@@ -429,7 +414,7 @@ int main() {
     }
 
     
-
+    //When life hits 0, the GameOver text and sounds appear.
     Text gameOverText;
     gameOverText.setFont(font);
     gameOverText.setString("GAME OVER");
